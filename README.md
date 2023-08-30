@@ -11,13 +11,13 @@
 
 #### Linux 开机执行脚本
 
-可通过将 shell 脚本加入到 crontab 中来完成
+可通过将 shell 脚本加入到 ~/.profile 中
 
 ```shell
-# 编辑此用户下的 crontab
-crontab -e
+# 编辑此用户下的 profile
+vim ~/.profile
 
 # 添加这一行命令
-@reboot shell脚本的路径
+bash shell脚本的路径
 ```
 
