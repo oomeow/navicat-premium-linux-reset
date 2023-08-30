@@ -1,4 +1,4 @@
-# navicat-premium-reset
+# navicat-premium-linux-reset
 该脚本通过删除json文件特定字段，dconf重置清除相关键值来完成 navicat premium 的试用期重置
 
 适用于 Linux 版本 navicat premium 的试用期
