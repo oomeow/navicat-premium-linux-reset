@@ -8,16 +8,15 @@
 > navicat premium 其他版本尚未尝试
 
 
+#### 用法
 
-#### Linux 开机执行脚本
-
-可通过将 shell 脚本加入到 ~/.profile 中
+执行 shell 脚本，或使用 python 命令执行 python 脚本
 
 ```shell
-# 编辑此用户下的 profile
-vim ~/.profile
+# 方式一：执行 shell 脚本
+chmod +x reset-navicat.sh
+./reset-navicat.sh
 
-# 添加这一行命令
-bash shell脚本的路径
+# 方式二：python 命令执行 python 脚本
+python resetNavicat.py
 ```
-

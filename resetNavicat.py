@@ -19,7 +19,7 @@ def logger_config(log_path, console_print=True):
     handler = RotatingFileHandler(log_path, maxBytes=max_file_size, backupCount=1, encoding='utf-8')
     handler.setLevel(logging.DEBUG)
     # 设置日志格式
-    formatter = logging.Formatter('%(asctime)s \t-\t %(filename)s \t[%(levelname)s] \t-\t %(message)s')
+    formatter = logging.Formatter('%(asctime)s - %(filename)s [%(levelname)s] - %(message)s')
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     if console_print:
@@ -171,7 +171,7 @@ if __name__ == '__main__':
     
     # 变量
     now_date = datetime.datetime.now()
-    log = logger_config(logger_path, console_print=True)
+    log = logger_config(logger_path, console_print=False)
     
     log.info('-----------------------------'.center(50, '-'))
     log.info('检查重置 navicat 试用期'.center(50))
