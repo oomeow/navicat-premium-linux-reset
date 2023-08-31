@@ -81,23 +81,26 @@ def check_network_clock_sync(sync_timeout_minutes=60, ntp_toggle_count=10):
                         break
                     log.debug('5s 后将再次检查时间是否同步')
                     if ntp_toggle_count > 0:
+                        # 检查 ntp 服务是否激活了
                         ntp_service_result = subprocess.run('timedatectl status | grep NTP | cut -d ":" -f 2', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
                         ntp_service_msg = ntp_service_result.stdout
                         if "inactive" in ntp_service_msg:
                             ntp_toggle_count -= 1
                             # sudo 交互式输入命令设置 ntp
-                            p1 = subprocess.Popen('sudo -S timedatectl set-ntp false', shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                            outs, errs = p1.communicate(bytes(auth_password, 'utf-8'), timeout=10)
-                            p1.wait()
+                            # p1 = subprocess.Popen('sudo -S timedatectl set-ntp false', shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                            # outs, errs = p1.communicate(bytes(auth_password, 'utf-8'), timeout=10)
+                            # p1.wait()
                             # log.debug(str(outs, 'utf-8'))
                             # log.debug(str(errs, 'utf-8'))
+                            subprocess.run('timedatectl set-ntp false', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                             sleep(time_sync_ntp_false_sleep_second)
                             # sudo 交互式输入命令设置 ntp
-                            p2 = subprocess.Popen('sudo -S timedatectl set-ntp true', shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                            outs, errs = p2.communicate(bytes(auth_password, 'utf-8'), timeout=10)
-                            p2.wait()
+                            # p2 = subprocess.Popen('sudo -S timedatectl set-ntp true', shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                            # outs, errs = p2.communicate(bytes(auth_password, 'utf-8'), timeout=10)
+                            # p2.wait()
                             # log.debug(str(outs, 'utf-8'))
                             # log.debug(str(errs, 'utf-8'))
+                            subprocess.run('timedatectl set-ntp true', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                             sleep(time_sync_ntp_true_sleep_second)
                         else:
                             sleep(time_sync_sum_sleep_second)
@@ -183,8 +186,7 @@ if __name__ == '__main__':
     format_pattern = '%Y-%m-%d %H:%M:%S'
     user_home_dir = os.environ['HOME']
     # sudo 需要输入的命令
-    auth_password = '123456'
-    # user_home_dir = '/home/hua'
+    # auth_password = '123456'
     base_file_dir = os.path.dirname(os.path.abspath(__file__))
     navicat_preferences_json_path = user_home_dir + '/.config/navicat/Premium/preferences.json'
     reset_json_info_file = base_file_dir + '/reset_navicat.json'

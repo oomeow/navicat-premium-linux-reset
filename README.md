@@ -20,3 +20,13 @@ chmod +x reset-navicat.sh
 # 方式二：python 命令执行 python 脚本
 python resetNavicat.py
 ```
+
+#### 用户开机登录后启动脚本
+```shell
+# 编辑用户目录下的 .profile 文件
+vim ~/.profile
+
+# 添加脚本命令
+# 例如：bash "$HOME/navicat-premium-linux-reset/reset-navicat.sh"
+bash shell脚本路径
+```
