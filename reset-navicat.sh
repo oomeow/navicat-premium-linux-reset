@@ -2,6 +2,9 @@
 
 # python 命令路径
 PYTHON_BIN_PATH=""
+# USER_LOGIN=0
+# DISPLAY_INFO=""
+# DISPLAY_COUNT=60
 
 # 错误信息显示
 message() {
@@ -46,5 +49,28 @@ script_dir=$(
   pwd
 )
 
-# 执行 python 脚本
-$PYTHON_BIN_PATH "${script_dir}/resetNavicat.py"
+# 等待用户登录
+# while [ $USER_LOGIN -eq 0 ]; do
+#   if [ -z "who | awk '{print $1}'" ]; then
+#     echo "$(date "+%Y-%m-%d %H:%M:%S") - 用户未登录，等待用户登录" >>${script_dir}/shell_log.log
+#     sleep 10s
+#   else
+#     USER_LOGIN=1
+#   fi
+# done
+
+# dconf 需要 DISPLAY 值
+# while [ -z $DISPLAY_INFO ] && [ $DISPLAY_COUNT -lt 0 ]; do
+#   if [ -n "echo $DISPLAY | awk '{print $1}'" ]; then
+#     DISPLAY_INFO="$(echo $DISPLAY | awk '{print $1}')"
+#     echo "$(date "+%Y-%m-%d %H:%M:%S") - DISPLAY_INFO: $DISPLAY_INFO" >>${script_dir}/shell_log.log
+#     sleep 2s
+#   else
+#     echo "$(date "+%Y-%m-%d %H:%M:%S") - 不存在 DISPLAY" >>${script_dir}/shell_log.log
+#     DISPLAY_COUNT-=1
+#     sleep 2s
+#   fi
+# done
+
+# 后台执行 python 脚本
+$PYTHON_BIN_PATH "${script_dir}/resetNavicat.py" &

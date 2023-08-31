@@ -43,9 +43,9 @@ def write_json_data(file_path, dict):
         json.dump(dict,r)
         
 
-def check_network_clock_sync(sync_timeout_minutes=60):
+def check_network_clock_sync(sync_timeout_minutes=60, ntp_toggle_count=10):
     global now_date
-    # 网络检查
+    # 网络连接检查
     network_check_sleep_second = 2
     network_check_count = sync_timeout_minutes * 60 / network_check_sleep_second
     network_check_cur_num = 0
@@ -77,13 +77,32 @@ def check_network_clock_sync(sync_timeout_minutes=60):
                 else:
                     time_sync_count -= 1
                     if time_sync_count == 0:
-                        log.error('%s分钟内，时间未能进行同步')
+                        log.error('%s分钟内，时间未能进行同步', sync_timeout_minutes)
                         break
                     log.debug('5s 后将再次检查时间是否同步')
-                    subprocess.run('timedatectl set-ntp 0', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                    sleep(time_sync_ntp_false_sleep_second)
-                    subprocess.run('timedatectl set-ntp 1', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                    sleep(time_sync_ntp_true_sleep_second)
+                    if ntp_toggle_count > 0:
+                        ntp_service_result = subprocess.run('timedatectl status | grep NTP | cut -d ":" -f 2', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                        ntp_service_msg = ntp_service_result.stdout
+                        if "inactive" in ntp_service_msg:
+                            ntp_toggle_count -= 1
+                            # sudo 交互式输入命令设置 ntp
+                            p1 = subprocess.Popen('sudo -S timedatectl set-ntp false', shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                            outs, errs = p1.communicate(bytes(auth_password, 'utf-8'), timeout=10)
+                            p1.wait()
+                            # log.debug(str(outs, 'utf-8'))
+                            # log.debug(str(errs, 'utf-8'))
+                            sleep(time_sync_ntp_false_sleep_second)
+                            # sudo 交互式输入命令设置 ntp
+                            p2 = subprocess.Popen('sudo -S timedatectl set-ntp true', shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                            outs, errs = p2.communicate(bytes(auth_password, 'utf-8'), timeout=10)
+                            p2.wait()
+                            # log.debug(str(outs, 'utf-8'))
+                            # log.debug(str(errs, 'utf-8'))
+                            sleep(time_sync_ntp_true_sleep_second)
+                        else:
+                            sleep(time_sync_sum_sleep_second)
+                    else:
+                        sleep(time_sync_sum_sleep_second)
         else:
             now_date = datetime.datetime.now()
             log.warning('%d 次网络检查均未发现网络连接，将使用本机系统时间 %s，该时间直接影响到 navicat 的试用期', network_check_count, now_date.strftime(format_pattern))
@@ -163,6 +182,9 @@ if __name__ == '__main__':
     # 常量
     format_pattern = '%Y-%m-%d %H:%M:%S'
     user_home_dir = os.environ['HOME']
+    # sudo 需要输入的命令
+    auth_password = '123456'
+    # user_home_dir = '/home/hua'
     base_file_dir = os.path.dirname(os.path.abspath(__file__))
     navicat_preferences_json_path = user_home_dir + '/.config/navicat/Premium/preferences.json'
     reset_json_info_file = base_file_dir + '/reset_navicat.json'
@@ -179,8 +201,8 @@ if __name__ == '__main__':
     
     result = subprocess.run('command -v dconf > /dev/null 2>&1', shell=True)
     return_code = result.returncode
-    check_network_clock_sync()
     if return_code:
         log.error('命令 dconf 不存在，请先安装 dconf')
     else:
+        check_network_clock_sync()
         reset_navicat()
