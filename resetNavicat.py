@@ -79,13 +79,14 @@ def check_network_clock_sync(sync_timeout_minutes=60, ntp_toggle_count=10):
                     if time_sync_count == 0:
                         log.error('%s分钟内，时间未能进行同步', sync_timeout_minutes)
                         break
-                    log.debug('5s 后将再次检查时间是否同步')
                     if ntp_toggle_count > 0:
                         # 检查 ntp 服务是否激活了
                         ntp_service_result = subprocess.run('timedatectl status | grep NTP | cut -d ":" -f 2', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
                         ntp_service_msg = ntp_service_result.stdout
                         if "inactive" in ntp_service_msg:
                             ntp_toggle_count -= 1
+                            log.info('NTP 时间同步服务未启动，即将重新开启 NTP 时间同步服务')
+                            log.debug('5s 后将再次检查时间是否同步')
                             # sudo 交互式输入命令设置 ntp
                             # p1 = subprocess.Popen('sudo -S timedatectl set-ntp false', shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                             # outs, errs = p1.communicate(bytes(auth_password, 'utf-8'), timeout=10)
@@ -103,8 +104,10 @@ def check_network_clock_sync(sync_timeout_minutes=60, ntp_toggle_count=10):
                             subprocess.run('timedatectl set-ntp true', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                             sleep(time_sync_ntp_true_sleep_second)
                         else:
+                            log.debug('5s 后将再次检查时间是否同步')
                             sleep(time_sync_sum_sleep_second)
                     else:
+                        log.debug('5s 后将再次检查时间是否同步')
                         sleep(time_sync_sum_sleep_second)
         else:
             now_date = datetime.datetime.now()
