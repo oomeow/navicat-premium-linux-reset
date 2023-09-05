@@ -12,16 +12,6 @@
 > 
 > 测试桌面环境：Gnome
 
-## 重置试用期主要步骤
-
-### 1、删除json文件中指定字段
-
-<img src="./images/json.png" alt="删除指定字段" style="border: 2px solid rgba(0,0,0,.2); box-shadow: 10px 10px 10px rgba(0,0,0,.4);"/>
-
-### 2、dconf 中需要重置的 navicat 相关的键值
-
-<img src="./images/dconf.png" alt="dconf 重置 navicat 相关的键值" style="border: 2px solid rgba(0,0,0,.2); box-shadow: 10px 10px 10px rgba(0,0,0,.4);"/>
-
 ## 用法
 
 执行 shell 脚本，或使用 python 命令执行 python 脚本
@@ -45,3 +35,13 @@ vim ~/.profile
 # 例如：bash "$HOME/navicat-premium-linux-reset/reset-navicat.sh"
 bash shell脚本路径
 ```
+
+## 重置 navicat 的思路
+
+### 1、删除json文件中指定字段
+
+<img src="./images/json.png" alt="删除指定字段" style="border: 2px solid rgba(0,0,0,.2); box-shadow: 10px 10px 10px rgba(0,0,0,.4);"/>
+
+### 2、dconf 中需要重置的 navicat 相关的键值
+
+<img src="./images/dconf.png" alt="dconf 重置 navicat 相关的键值" style="border: 2px solid rgba(0,0,0,.2); box-shadow: 10px 10px 10px rgba(0,0,0,.4);"/>
