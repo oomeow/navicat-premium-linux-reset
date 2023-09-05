@@ -50,7 +50,7 @@ def write_json_data(file_path, dict):
     写入数据到json文件中
     '''
     with open(file_path,'w') as r:
-        json.dump(dict,r)
+        json.dump(dict, r, indent=4)
 
 
 def check_network_connection_status(check_timeout_minutes=60, check_time_interval_second=2):
@@ -91,7 +91,7 @@ def check_ntp_service_status(check_timeout_minutes=10):
             log.debug('5s 后将再次检查 NTP 时间同步服务是否启动')
             # sudo 交互式输入命令设置 ntp
             # p1 = subprocess.Popen('sudo -S timedatectl set-ntp false', shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            # outs, errs = p1.communicate(bytes(auth_password, 'utf-8'), timeout=10)
+            # outs, errs = p1.communicate(bytes(AUTH_PASSWORD, 'utf-8'), timeout=10)
             # p1.wait()
             # log.debug(str(outs, 'utf-8'))
             # log.debug(str(errs, 'utf-8'))
@@ -99,7 +99,7 @@ def check_ntp_service_status(check_timeout_minutes=10):
             sleep(1)
             # sudo 交互式输入命令设置 ntp
             # p2 = subprocess.Popen('sudo -S timedatectl set-ntp true', shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            # outs, errs = p2.communicate(bytes(auth_password, 'utf-8'), timeout=10)
+            # outs, errs = p2.communicate(bytes(AUTH_PASSWORD, 'utf-8'), timeout=10)
             # p2.wait()
             # log.debug(str(outs, 'utf-8'))
             # log.debug(str(errs, 'utf-8'))
@@ -156,22 +156,23 @@ def need_to_reset_navicat():
     '''
     判断是否需要重置 navicat 试用期
     '''
-    reset_json_file_exists = os.path.exists(reset_json_info_file)
+    reset_json_file_exists = os.path.exists(RESET_JSON_INFO_FILE)
     if reset_json_file_exists:
         try:
-            json_data = get_json_data(reset_json_info_file)
+            json_data = get_json_data(RESET_JSON_INFO_FILE)
             exists_filed = 'reset_date' in json_data and 'trial_period' in json_data
             if not exists_filed:
-                log.info('脚本重置信息的 json 中缺失字段，需要重置 navicat 试用期')
+                log.info('脚本重置信息的 json 中缺失字段，即将重置 navicat 试用期')
                 return True
-            next_reset_date_str = json_data['trial_period']
-            next_reset_date = datetime.datetime.strptime(next_reset_date_str, format_pattern)
-            count_days = (next_reset_date - now_date).days
+            trial_period_str = json_data['trial_period']
+            trial_period = datetime.datetime.strptime(trial_period_str, DATE_FORMAT_PATTERN)
+            # 距试用期剩余天数
+            count_days = (trial_period - now_date).days
             if count_days > 0 and count_days <= 14:
-                log.info('试用期至 %s, 下次重置将在 %d 天后进行', next_reset_date_str, count_days)
+                log.info('试用期至 %s, 下次重置将在 %d 天后进行', trial_period_str, count_days)
                 return False
             elif count_days == 0:
-                log.info('距试用期 %s 不到一天时间，即将重置 navicat 试用期', next_reset_date_str)
+                log.info('距试用期 %s 不到一天时间，即将重置 navicat 试用期', trial_period_str)
                 return True
             else:
                 log.info('距离试用过期过长或过短，即将重置 navicat 试用期')
@@ -189,18 +190,21 @@ def update_navicat_reset_json_data(reseted):
     '''
     生成更新脚本重置 navicat 试用期的信息数据
     '''
-    reset_date_str = now_date.strftime(format_pattern)
-    trial_period_str = (now_date + datetime.timedelta(days=14)).strftime(format_pattern)
+    reset_date_str = now_date.strftime(DATE_FORMAT_PATTERN)
+    trial_period_str = (now_date + datetime.timedelta(days=14)).strftime(DATE_FORMAT_PATTERN)
     if not reseted:
-        json_data = get_json_data(reset_json_info_file)
+        json_data = get_json_data(RESET_JSON_INFO_FILE)
         reset_date_str = json_data['reset_date']
         trial_period_str = json_data['trial_period']
     reset_json = {
-        'check_date': now_date.strftime(format_pattern),
+        # 检查日期
+        'check_date': now_date.strftime(DATE_FORMAT_PATTERN),
+        # 重置日期
         'reset_date': reset_date_str,
+        # 试用期过期时间
         'trial_period': trial_period_str
     }
-    write_json_data(reset_json_info_file, reset_json)
+    write_json_data(RESET_JSON_INFO_FILE, reset_json)
             
 
 def reset_navicat():
@@ -208,12 +212,12 @@ def reset_navicat():
     重置 navicat 试用期
     '''
     if need_to_reset_navicat():
-        json_data = get_json_data(navicat_preferences_json_path)
+        json_data = get_json_data(NAVICAT_PREFERENCES_JSON_PATH)
         # 移除 B966DBD409B87EF577C9BBF3363E9614 键值
         json_data.pop('B966DBD409B87EF577C9BBF3363E9614', None)
-        write_json_data(navicat_preferences_json_path, json_data)
+        write_json_data(NAVICAT_PREFERENCES_JSON_PATH, json_data)
         update_navicat_reset_json_data(True)
-        result = subprocess.run(dconf_reset_cmd, shell=True, capture_output=True, text=True)
+        result = subprocess.run(DCONF_RESET_CMD, shell=True, capture_output=True, text=True)
         return_code = result.returncode
         if return_code:
             error_msg = result.stderr
@@ -227,19 +231,19 @@ def reset_navicat():
 
 if __name__ == '__main__':
     # 常量
-    format_pattern = '%Y-%m-%d %H:%M:%S'
-    user_home_dir = os.environ['HOME']
-    # sudo 需要输入的命令
-    # auth_password = '123456'
-    base_file_dir = os.path.dirname(os.path.abspath(__file__))
-    navicat_preferences_json_path = user_home_dir + '/.config/navicat/Premium/preferences.json'
-    reset_json_info_file = base_file_dir + '/reset_navicat.json'
-    logger_path = base_file_dir + '/logs/reset_navicat.log'
-    dconf_reset_cmd = 'dconf reset -f /com/premiumsoft/navicat-premium/'
+    DATE_FORMAT_PATTERN = '%Y-%m-%d %H:%M:%S'
+    USER_HOME_DIR = os.environ['HOME']
+    # sudo 需要输入的密码
+    # AUTH_PASSWORD = '123456'
+    BASE_FILE_DIR = os.path.dirname(os.path.abspath(__file__))
+    NAVICAT_PREFERENCES_JSON_PATH = USER_HOME_DIR + '/.config/navicat/Premium/preferences.json'
+    RESET_JSON_INFO_FILE = BASE_FILE_DIR + '/reset_navicat.json'
+    LOGGER_PATH = BASE_FILE_DIR + '/logs/reset_navicat.log'
+    DCONF_RESET_CMD = 'dconf reset -f /com/premiumsoft/navicat-premium/'
     
     # 变量
     now_date = datetime.datetime.now()
-    log = logger_config(logger_path, console_print=False)
+    log = logger_config(LOGGER_PATH, console_print=False)
     
     log.info('-----------------------------'.center(50, '-'))
     log.info('检查重置 navicat 试用期'.center(50))
@@ -253,8 +257,8 @@ if __name__ == '__main__':
         sync_status = check_network_clock_sync()
         if sync_status:
             now_date = datetime.datetime.now()
-            log.info('时间已从网络中同步：%s', now_date.strftime(format_pattern))
+            log.info('时间已从网络中同步：%s', now_date.strftime(DATE_FORMAT_PATTERN))
         else:
             now_date = datetime.datetime.now()
-            log.info('时间同步失败，使用本机系统时间：%s，该时间直接影响到 navicat 的试用期', now_date.strftime(format_pattern))
+            log.info('时间同步失败，使用本机系统时间：%s，该时间直接影响到 navicat 的试用期', now_date.strftime(DATE_FORMAT_PATTERN))
         reset_navicat()
