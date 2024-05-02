@@ -4,12 +4,12 @@
 
 适用于 Linux 版本 navicat premium 的试用期
 
-- 16.2.5 版本可用 
+- 16.2.5 版本可用
 
-***navicat premium 其他版本尚未尝试***
+**_navicat premium 其他版本尚未尝试_**
 
 > 测试系统：Debian12
-> 
+>
 > 测试桌面环境：Gnome
 
 ## 用法
@@ -27,18 +27,29 @@ python reset_navicat.py
 
 ## 用户开机登录后启动脚本
 
-```shell
-# 编辑用户目录下的 .profile 文件
-vim ~/.profile
+- install 脚本 (行为和手动一样)
 
-# 添加脚本命令
-# 例如：bash "$HOME/navicat-premium-linux-reset/reset-navicat.sh"
-bash shell脚本路径
-```
+  ```shell
+    # 开启
+    ./install.sh
+    # 关闭
+    ./install.sh -u
+  ```
+
+- 手动
+
+  ```shell
+    # 编辑用户目录下的 .profile 文件
+    vim ~/.profile
+
+    # 添加脚本命令
+    # 例如：bash "$HOME/navicat-premium-linux-reset/reset-navicat.sh"
+    bash shell脚本路径
+  ```
 
 ## 重置 navicat 的思路
 
-### 1、删除json文件中指定字段
+### 1、删除 json 文件中指定字段
 
 <img src="./images/json.png" alt="删除指定字段" style="border: 2px solid rgba(0,0,0,.2); box-shadow: 10px 10px 10px rgba(0,0,0,.4);"/>
 
