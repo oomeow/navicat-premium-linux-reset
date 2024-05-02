@@ -27,25 +27,26 @@ python reset_navicat.py
 
 ## 用户开机登录后启动脚本
 
-- install 脚本 (行为和手动一样)
+### install 脚本 (行为和手动一样)
 
-  ```shell
-    # 开启
-    ./install.sh
-    # 关闭
-    ./install.sh -u
-  ```
+```shell
+# 开启
+./install.sh
 
-- 手动
+# 关闭
+./install.sh -u
+```
 
-  ```shell
-    # 编辑用户目录下的 .profile 文件
-    vim ~/.profile
+### 手动
 
-    # 添加脚本命令
-    # 例如：bash "$HOME/navicat-premium-linux-reset/reset-navicat.sh"
-    bash shell脚本路径
-  ```
+```shell
+# 编辑用户目录下的 .profile 文件
+vim ~/.profile
+
+# 添加脚本命令
+# 例如：bash "$HOME/navicat-premium-linux-reset/reset-navicat.sh"
+bash shell脚本路径
+```
 
 ## 重置 navicat 的思路
 
