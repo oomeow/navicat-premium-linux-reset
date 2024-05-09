@@ -1,0 +1,6 @@
+[Desktop Entry]
+Exec=script_path
+Icon=application-x-shellscript
+Name=reset-navicat.sh
+Type=Application
+X-KDE-AutostartScript=true
