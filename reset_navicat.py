@@ -237,7 +237,7 @@ def need_to_reset_navicat():
             return True
     else:
         log.info(
-            "脚本重置信息的 json 文件 [reset_navicat.json] 不存在, 即将重置 navicat 试用期"
+            "脚本重置信息的 json 文件 [reset_date.json] 不存在, 即将重置 navicat 试用期"
         )
         return True
 
@@ -298,7 +298,7 @@ BASE_FILE_DIR = os.path.dirname(os.path.abspath(__file__))
 NAVICAT_PREFERENCES_JSON_PATH = (
     USER_HOME_DIR + "/.config/navicat/Premium/preferences.json"
 )
-RESET_JSON_INFO_FILE = BASE_FILE_DIR + "/reset_navicat.json"
+RESET_JSON_INFO_FILE = BASE_FILE_DIR + "/reset_date.json"
 LOGGER_PATH = BASE_FILE_DIR + "/logs/reset_navicat.log"
 DCONF_RESET_CMD = "dconf reset -f /com/premiumsoft/navicat-premium/"
 now_date = datetime.datetime.now()
