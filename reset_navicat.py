@@ -112,13 +112,6 @@ def check_ntp_service_status(check_timeout_minutes=10):
         if "inactive" in ntp_service_msg:
             log.info("NTP 时间同步服务未启动，即将重新开启 NTP 时间同步服务")
             log.debug("5s 后将再次检查 NTP 时间同步服务是否启动")
-            # sudo 交互式输入命令设置 ntp
-            # p1 = subprocess.Popen('sudo -S timedatectl set-ntp false', shell=True,
-            #           stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            # outs, errs = p1.communicate(bytes(AUTH_PASSWORD, 'utf-8'), timeout=10)
-            # p1.wait()
-            # log.debug(str(outs, 'utf-8'))
-            # log.debug(str(errs, 'utf-8'))
             subprocess.run(
                 "timedatectl set-ntp false",
                 shell=True,
@@ -127,13 +120,6 @@ def check_ntp_service_status(check_timeout_minutes=10):
                 check=False,
             )
             sleep(1)
-            # sudo 交互式输入命令设置 ntp
-            # p2 = subprocess.Popen('sudo -S timedatectl set-ntp true', shell=True,
-            #           stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            # outs, errs = p2.communicate(bytes(AUTH_PASSWORD, 'utf-8'), timeout=10)
-            # p2.wait()
-            # log.debug(str(outs, 'utf-8'))
-            # log.debug(str(errs, 'utf-8'))
             subprocess.run(
                 "timedatectl set-ntp true",
                 shell=True,
@@ -271,8 +257,9 @@ def reset_navicat():
     """
     if need_to_reset_navicat():
         json_data = get_json_data(NAVICAT_PREFERENCES_JSON_PATH)
-        # 移除 B966DBD409B87EF577C9BBF3363E9614 键值
-        json_data.pop("B966DBD409B87EF577C9BBF3363E9614", None)
+        # 移除相关键值
+        for key in JSON_FIELD:
+            json_data.pop(key, None)
         write_json_data(NAVICAT_PREFERENCES_JSON_PATH, json_data)
         update_navicat_reset_json_data(True)
         reset_need = subprocess.run(
@@ -292,8 +279,6 @@ def reset_navicat():
 # 全局变量
 DATE_FORMAT_PATTERN = "%Y-%m-%d %H:%M:%S"
 USER_HOME_DIR = os.environ["HOME"]
-# sudo 需要输入的密码
-# AUTH_PASSWORD = '123456'
 BASE_FILE_DIR = os.path.dirname(os.path.abspath(__file__))
 NAVICAT_PREFERENCES_JSON_PATH = (
     USER_HOME_DIR + "/.config/navicat/Premium/preferences.json"
@@ -303,6 +288,13 @@ LOGGER_PATH = BASE_FILE_DIR + "/logs/reset_navicat.log"
 DCONF_RESET_CMD = "dconf reset -f /com/premiumsoft/navicat-premium/"
 now_date = datetime.datetime.now()
 log = logger_config(LOGGER_PATH, console_print=False)
+# 需要删除的 json 字段
+JSON_FIELD = [
+    # navicat 16 版本
+    "B966DBD409B87EF577C9BBF3363E9614",
+    # navicat 17 版本
+    "014BF4EC24C114BEF46E1587042B3619"
+]
 
 
 if __name__ == "__main__":
