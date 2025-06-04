@@ -14,6 +14,7 @@
 
 - 16.2.5 版本可用
 - 17.2.2 版本可用
+- 17.2.4 版本可用
 
 **_navicat premium 其他版本尚未尝试_**
 
@@ -22,7 +23,8 @@
 > - Debian12 (Gnome)
 > 
 > - Arc Linux(KDE)
-
+> 
+> - Arch Linux(Gnome)
 ## 用法
 
 执行 shell 脚本，或使用 python 命令执行 python 脚本
